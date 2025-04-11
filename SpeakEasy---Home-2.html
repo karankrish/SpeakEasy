@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SpeakEasy - Communication Coach</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+// Function to handle deep linking from V3 to V5
+function setupDeepLinking() {
+  // Add event listeners to the work, social, and dating buttons in V3
+  if (window.parent && window.parent.document) {
+    try {
+      // This assumes V3 has elements with these IDs
+      const workButtonV3 = window.parent.document.getElementById('work-button-v3');
+      const socialButtonV3 = window.parent.document.getElementById('social-button-v3');
+      const datingButtonV3 = window.parent.document.getElementById('dating-button-v3');
+      
+      if (workButtonV3) {
+        workButtonV3.addEventListener('click', () => {
+          window.location.href = "?scenario=work";
+        });
+      }
+      
+      if (socialButtonV3) {
+        socialButtonV3.addEventListener('click', () => {
+          window.location.href = "?scenario=social";
+        });
+      }
+      
+      if (datingButtonV3) {
+        datingButtonV3.addEventListener('click', () => {
+          window.location.href = "?scenario=dating";
+        });
+      }
+    } catch (e) {
+      console.log("Deep linking setup failed:", e);
+    }
+  }
+}
+
+// Try to set up deep linking when the page loads
+window.addEventListener('load', setupDeepLinking);tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#f97316'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+width: 375px;
+height: 762px;
+margin: 0 auto;
+overflow: hidden;
+position: relative;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.content-container {
+height: calc(100% - 120px);
+overflow-y: auto;
+overflow-x: hidden;
+padding-top: 60px;
+padding-bottom: 60px;
+padding-left: env(safe-area-inset-left);
+padding-right: env(safe-area-inset-right);
+}
+.progress-bar {
+height: 8px;
+border-radius: 4px;
+background-color: #e5e7eb;
+}
+.progress-fill {
+height: 100%;
+border-radius: 4px;
+}
+.dynamic-island-padding {
+padding-top: env(safe-area-inset-top);
+}
+.scenario-option {
+transition: all 0.2s ease;
+}
+.scenario-option.selected {
+border-color: #3b82f6;
+background-color: #eff6ff;
+}
+.mode-option {
+transition: all 0.2s ease;
+}
+.mode-option.selected {
+border-color: #3b82f6;
+background-color: #eff6ff;
+}
+.chat-container {
+height: calc(100% - 120px);
+display: flex;
+flex-direction: column;
+}
+.chat-messages {
+flex: 1;
+overflow-y: auto;
+padding: 16px;
+}
+.message {
+max-width: 80%;
+margin-bottom: 12px;
+padding: 10px 14px;
+border-radius: 18px;
+position: relative;
+line-height: 1.4;
+}
+.message.ai {
+background-color: #f1f5f9;
+border-top-left-radius: 4px;
+align-self: flex-start;
+}
+.message.user {
+background-color: #3b82f6;
+color: white;
+border-top-right-radius: 4px;
+align-self: flex-end;
+}
+.chat-input {
+padding: 12px;
+border-top: 1px solid #e5e7eb;
+background-color: white;
+}
+.feedback-card {
+border-radius: 12px;
+margin-bottom: 16px;
+}
+.screen {
+display: none;
+}
+.screen.active {
+display: block;
+}
+</style>
+</head>
+<body class="bg-white">
+<!-- Header Section -->
+<header class="fixed top-0 w-full bg-white shadow-sm z-10 px-4 py-3 flex items-center justify-between dynamic-island-padding">
+<div class="flex items-center">
+<div id="back-button" class="w-8 h-8 flex items-center justify-center cursor-pointer mr-2">
+<i class="ri-arrow-left-line ri-lg text-gray-600"></i>
+</div>
+<div class="ml-1">
+<p class="text-sm font-medium">Practice Session</p>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="w-8 h-8 flex items-center justify-center cursor-pointer">
+<i class="ri-question-line ri-lg text-gray-600"></i>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<div class="content-container px-4" style="padding-top: calc(60px + env(safe-area-inset-top));">
+<!-- Screen 1: Select Scenario -->
+<div id="scenario-screen" class="screen active">
+<h2 class="text-xl font-medium mb-6">Select a Scenario</h2>
+<div class="space-y-4 mb-8">
+<div class="scenario-option border border-gray-200 rounded-md p-4 flex items-center cursor-pointer" data-scenario="work">
+<div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+<i class="ri-briefcase-line ri-lg text-primary"></i>
+</div>
+<div class="flex-1">
+<p class="font-medium">Work</p>
+<p class="text-sm text-gray-600">Job interviews, presentations, meetings</p>
+</div>
+<div class="w-6 h-6 flex items-center justify-center scenario-check opacity-0">
+<i class="ri-check-line ri-lg text-primary"></i>
+</div>
+</div>
+<div class="scenario-option border border-gray-200 rounded-md p-4 flex items-center cursor-pointer" data-scenario="social">
+<div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
+<i class="ri-group-line ri-lg text-green-600"></i>
+</div>
+<div class="flex-1">
+<p class="font-medium">Social</p>
+<p class="text-sm text-gray-600">Networking events, small talk, group settings</p>
+</div>
+<div class="w-6 h-6 flex items-center justify-center scenario-check opacity-0">
+<i class="ri-check-line ri-lg text-primary"></i>
+</div>
+</div>
+<div class="scenario-option border border-gray-200 rounded-md p-4 flex items-center cursor-pointer" data-scenario="dating">
+<div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
+<i class="ri-heart-line ri-lg text-red-500"></i>
+</div>
+<div class="flex-1">
+<p class="font-medium">Dating</p>
+<p class="text-sm text-gray-600">First dates, romantic conversations, flirting</p>
+</div>
+<div class="w-6 h-6 flex items-center justify-center scenario-check opacity-0">
+<i class="ri-check-line ri-lg text-primary"></i>
+</div>
+</div>
+</div>
+<button id="scenario-next" class="w-full bg-gray-300 text-gray-500 py-3 rounded-button font-medium cursor-not-allowed" disabled>Continue</button>
+</div>
+<!-- Screen 2: Select Mode -->
+<div id="mode-screen" class="screen">
+<h2 class="text-xl font-medium mb-2">Select Practice Mode</h2>
+<p class="text-sm text-gray-600 mb-6">Choose how you want to practice your communication skills</p>
+<div class="space-y-4 mb-8">
+<div class="mode-option border border-gray-200 rounded-md p-4 flex items-center cursor-pointer" data-mode="chat">
+<div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+<i class="ri-message-3-line ri-lg text-primary"></i>
+</div>
+<div class="flex-1">
+<p class="font-medium">Chat Practice</p>
+<p class="text-sm text-gray-600">Text-based conversation with AI coach</p>
+</div>
+<div class="w-6 h-6 flex items-center justify-center mode-check opacity-0">
+<i class="ri-check-line ri-lg text-primary"></i>
+</div>
+</div>
+<div class="mode-option border border-gray-200 rounded-md p-4 flex items-center cursor-pointer" data-mode="voice">
+<div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+<i class="ri-mic-line ri-lg text-purple-600"></i>
+</div>
+<div class="flex-1">
+<p class="font-medium">Voice Practice</p>
+<p class="text-sm text-gray-600">Audio conversation with AI coach</p>
+</div>
+<div class="w-6 h-6 flex items-center justify-center mode-check opacity-0">
+<i class="ri-check-line ri-lg text-primary"></i>
+</div>
+</div>
+<div class="mode-option border border-gray-200 rounded-md p-4 flex items-center cursor-pointer" data-mode="video">
+<div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+<i class="ri-vidicon-line ri-lg text-orange-600"></i>
+</div>
+<div class="flex-1">
+<p class="font-medium">Video Practice</p>
+<p class="text-sm text-gray-600">Video conversation with AI coach</p>
+</div>
+<div class="w-6 h-6 flex items-center justify-center mode-check opacity-0">
+<i class="ri-check-line ri-lg text-primary"></i>
+</div>
+</div>
+</div>
+<button id="mode-next" class="w-full bg-gray-300 text-gray-500 py-3 rounded-button font-medium cursor-not-allowed" disabled>Start Practice</button>
+</div>
+<!-- Screen 3: Chat Practice -->
+<div id="chat-screen" class="screen">
+<div class="chat-container">
+<div class="chat-messages flex flex-col">
+<div class="message ai">
+<p>Hi there! I'm your AI communication coach. Let's practice your scenario. What would you like to discuss today?</p>
+</div>
+<!-- Messages will be added here dynamically -->
+</div>
+<div class="chat-input">
+<div class="flex items-center">
+<input type="text" id="chat-message-input" class="flex-1 border border-gray-200 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Type your message...">
+<button id="send-message" class="ml-2 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white">
+<i class="ri-send-plane-fill ri-lg"></i>
+</button>
+</div>
+<div class="flex justify-between mt-2">
+<button id="end-practice" class="text-sm text-gray-500 flex items-center">
+<i class="ri-close-circle-line mr-1"></i> End Practice
+</button>
+<div class="text-xs text-gray-400">Minimum 5 exchanges recommended</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Screen 4: Voice Practice -->
+<div id="voice-screen" class="screen">
+<div class="flex flex-col items-center justify-center h-full">
+<div class="w-32 h-32 bg-purple-100 rounded-full flex items-center justify-center mb-6">
+<i class="ri-mic-fill ri-4x text-purple-600"></i>
+</div>
+<p class="text-lg font-medium mb-2">Voice Practice Mode</p>
+<p class="text-sm text-gray-600 text-center mb-8">Tap the microphone and start speaking. Our AI will respond to you.</p>
+<div class="w-full px-4">
+<div class="bg-gray-100 rounded-md p-4 mb-6">
+<p class="text-sm font-medium mb-1">AI Coach:</p>
+<p class="text-sm">"Hello! I'm your AI communication coach. Let's practice your scenario. What would you like to discuss today?"</p>
+</div>
+<button id="start-recording" class="w-full bg-purple-600 text-white py-3 rounded-button font-medium mb-3">
+<i class="ri-mic-line mr-2"></i> Start Recording
+</button>
+<button id="end-voice-practice" class="w-full border border-gray-300 text-gray-700 py-3 rounded-button font-medium">
+End Practice
+</button>
+</div>
+</div>
+</div>
+<!-- Screen 5: Video Practice -->
+<div id="video-screen" class="screen">
+<div class="flex flex-col h-full">
+<div class="flex-1 bg-gray-100 rounded-md mb-4 relative overflow-hidden">
+<div class="absolute inset-0 flex items-center justify-center">
+<i class="ri-vidicon-fill ri-4x text-gray-400"></i>
+</div>
+<div class="absolute bottom-4 right-4 w-24 h-36 bg-gray-800 rounded-md"></div>
+</div>
+<div class="bg-gray-100 rounded-md p-4 mb-4">
+<p class="text-sm font-medium mb-1">AI Coach:</p>
+<p class="text-sm">"Hello! I'm your AI communication coach. Let's practice your scenario. What would you like to discuss today?"</p>
+</div>
+<div class="flex space-x-3 mb-4">
+<button id="toggle-camera" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-button font-medium">
+<i class="ri-camera-line mr-2"></i> Camera
+</button>
+<button id="toggle-mic" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-button font-medium">
+<i class="ri-mic-line mr-2"></i> Mic
+</button>
+<button id="end-video-practice" class="flex-1 bg-red-500 text-white py-3 rounded-button font-medium">
+<i class="ri-close-line mr-2"></i> End
+</button>
+</div>
+</div>
+</div>
+<!-- Screen 6: Feedback Summary -->
+<div id="feedback-screen" class="screen">
+<h2 class="text-xl font-medium mb-2">Practice Feedback</h2>
+<p class="text-sm text-gray-600 mb-6">Here's how you did in your practice session</p>
+<div class="feedback-card bg-white border border-gray-200 rounded-md p-4 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center">
+<div id="feedback-scenario-icon" class="w-10 h-10 rounded-full flex items-center justify-center mr-3">
+<!-- Icon will be set dynamically -->
+</div>
+<div>
+<p id="feedback-scenario-text" class="font-medium">Work Scenario</p>
+<p id="feedback-mode-text" class="text-sm text-gray-600">Chat Practice</p>
+</div>
+</div>
+<div class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+Completed
+</div>
+</div>
+<div class="border-t border-gray-100 pt-4 mb-4">
+<p class="font-medium mb-2">Performance Summary</p>
+<p class="text-sm text-gray-600 mb-4">You demonstrated good communication skills with clear expression of ideas. Your responses were thoughtful and engaging.</p>
+<div class="space-y-3">
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Clarity</p>
+<p class="text-sm">85%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 85%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Engagement</p>
+<p class="text-sm">92%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 92%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Confidence</p>
+<p class="text-sm">78%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 78%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="border-t border-gray-100 pt-4">
+<p class="font-medium mb-2">Areas for Improvement</p>
+<ul class="text-sm text-gray-600 space-y-2 pl-5 list-disc">
+<li>Try to be more concise in your responses</li>
+<li>Practice active listening by acknowledging what was said</li>
+<li>Use more specific examples to illustrate your points</li>
+</ul>
+</div>
+</div>
+<div class="flex space-x-3 mt-6">
+<button id="practice-again" class="flex-1 border border-primary text-primary py-3 rounded-button font-medium">
+Practice Again
+</button>
+<a href="https://readdy.ai/home/718d17de-a9a8-499c-b089-8edce736cb45/ad82f16b-06d8-45c1-ad23-1736abca9c26" data-readdy="true">
+<button id="return-home" class="flex-1 bg-primary text-white py-3 rounded-button font-medium">
+Return Home
+</button>
+</a>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 z-10" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="grid grid-cols-4 h-14">
+<div class="flex flex-col items-center justify-center cursor-pointer" id="nav-home">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-home-5-line ri-lg text-gray-500"></i>
+</div>
+<p class="text-xs text-gray-500 mt-0.5">Home</p>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer" id="nav-practice">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-message-3-fill ri-lg text-primary"></i>
+</div>
+<p class="text-xs text-primary mt-0.5">Practice</p>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer" id="nav-progress">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-bar-chart-line ri-lg text-gray-500"></i>
+</div>
+<p class="text-xs text-gray-500 mt-0.5">Progress</p>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer" id="nav-profile">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-line ri-lg text-gray-500"></i>
+</div>
+<p class="text-xs text-gray-500 mt-0.5">Profile</p>
+</div>
+</div>
+</nav>
+<script>
+// Function to handle deep linking from V3 to V5
+function setupDeepLinking() {
+  // Add event listeners to the work, social, and dating buttons in V3
+  if (window.parent && window.parent.document) {
+    try {
+      // This assumes V3 has elements with these IDs
+      const workButtonV3 = window.parent.document.getElementById('work-button-v3');
+      const socialButtonV3 = window.parent.document.getElementById('social-button-v3');
+      const datingButtonV3 = window.parent.document.getElementById('dating-button-v3');
+      
+      if (workButtonV3) {
+        workButtonV3.addEventListener('click', () => {
+          window.location.href = "?scenario=work";
+        });
+      }
+      
+      if (socialButtonV3) {
+        socialButtonV3.addEventListener('click', () => {
+          window.location.href = "?scenario=social";
+        });
+      }
+      
+      if (datingButtonV3) {
+        datingButtonV3.addEventListener('click', () => {
+          window.location.href = "?scenario=dating";
+        });
+      }
+    } catch (e) {
+      console.log("Deep linking setup failed:", e);
+    }
+  }
+}
+
+// Try to set up deep linking when the page loads
+window.addEventListener('load', setupDeepLinking);
+// Global variables
+let selectedScenario = null;
+let selectedMode = null;
+
+// Check for URL parameters to set initial scenario
+function getUrlParameter(name) {
+  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+  const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+  const results = regex.exec(location.search);
+  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+// Set initial scenario based on URL parameter
+const initialScenario = getUrlParameter('scenario');
+if (initialScenario) {
+  selectedScenario = initialScenario;
+  // We'll use this later to auto-select the scenario
+}
+// DOM Elements
+const scenarioScreen = document.getElementById('scenario-screen');
+const modeScreen = document.getElementById('mode-screen');
+const chatScreen = document.getElementById('chat-screen');
+const voiceScreen = document.getElementById('voice-screen');
+const videoScreen = document.getElementById('video-screen');
+const feedbackScreen = document.getElementById('feedback-screen');
+const scenarioOptions = document.querySelectorAll('.scenario-option');
+const modeOptions = document.querySelectorAll('.mode-option');
+const scenarioNextBtn = document.getElementById('scenario-next');
+const modeNextBtn = document.getElementById('mode-next');
+const backButton = document.getElementById('back-button');
+const chatInput = document.getElementById('chat-message-input');
+const sendMessageBtn = document.getElementById('send-message');
+const chatMessages = document.querySelector('.chat-messages');
+const endPracticeBtn = document.getElementById('end-practice');
+const startRecordingBtn = document.getElementById('start-recording');
+const endVoicePracticeBtn = document.getElementById('end-voice-practice');
+const toggleCameraBtn = document.getElementById('toggle-camera');
+const toggleMicBtn = document.getElementById('toggle-mic');
+const endVideoPracticeBtn = document.getElementById('end-video-practice');
+const practiceAgainBtn = document.getElementById('practice-again');
+const returnHomeBtn = document.getElementById('return-home');
+const navHome = document.getElementById('nav-home');
+const navPractice = document.getElementById('nav-practice');
+const navProgress = document.getElementById('nav-progress');
+const navProfile = document.getElementById('nav-profile');
+// Functions to show screens
+function showScreen(screen) {
+document.querySelectorAll('.screen').forEach(s => {
+s.classList.remove('active');
+});
+screen.classList.add('active');
+}
+// Function to select a scenario
+function selectScenario(scenarioType) {
+  // Reset all options
+  scenarioOptions.forEach(opt => {
+    opt.classList.remove('selected');
+    opt.querySelector('.scenario-check').classList.add('opacity-0');
+  });
+  
+  // Find and select the matching option
+  const option = Array.from(scenarioOptions).find(opt => opt.dataset.scenario === scenarioType);
+  if (option) {
+    option.classList.add('selected');
+    option.querySelector('.scenario-check').classList.remove('opacity-0');
+    // Enable next button
+    scenarioNextBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+    scenarioNextBtn.classList.add('bg-primary', 'text-white');
+    scenarioNextBtn.disabled = false;
+    // Store selected scenario
+    selectedScenario = scenarioType;
+  }
+}
+
+// Scenario selection
+scenarioOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    selectScenario(option.dataset.scenario);
+  });
+});
+
+// Auto-select scenario if provided in URL
+if (initialScenario) {
+  selectScenario(initialScenario);
+  // Auto proceed to mode selection
+  setTimeout(() => {
+    scenarioNextBtn.click();
+  }, 500);
+}
+// Mode selection
+modeOptions.forEach(option => {
+option.addEventListener('click', () => {
+// Reset all options
+modeOptions.forEach(opt => {
+opt.classList.remove('selected');
+opt.querySelector('.mode-check').classList.add('opacity-0');
+});
+// Select clicked option
+option.classList.add('selected');
+option.querySelector('.mode-check').classList.remove('opacity-0');
+// Enable next button
+modeNextBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+modeNextBtn.classList.add('bg-primary', 'text-white');
+modeNextBtn.disabled = false;
+// Store selected mode
+selectedMode = option.dataset.mode;
+});
+});
+// Navigation between screens
+scenarioNextBtn.addEventListener('click', () => {
+showScreen(modeScreen);
+});
+modeNextBtn.addEventListener('click', () => {
+if (selectedMode === 'chat') {
+showScreen(chatScreen);
+} else if (selectedMode === 'voice') {
+showScreen(voiceScreen);
+} else if (selectedMode === 'video') {
+showScreen(videoScreen);
+}
+});
+backButton.addEventListener('click', () => {
+if (modeScreen.classList.contains('active')) {
+showScreen(scenarioScreen);
+} else if (chatScreen.classList.contains('active') || voiceScreen.classList.contains('active') || videoScreen.classList.contains('active')) {
+showScreen(modeScreen);
+} else if (feedbackScreen.classList.contains('active')) {
+navHome.click();
+} else {
+navHome.click();
+}
+});
+// Chat functionality
+function addMessage(text, isUser) {
+const messageDiv = document.createElement('div');
+messageDiv.classList.add('message');
+messageDiv.classList.add(isUser ? 'user' : 'ai');
+messageDiv.innerHTML = `<p>${text}</p>`;
+chatMessages.appendChild(messageDiv);
+chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+function aiResponse() {
+const responses = {
+'work': [
+"That's a great point about workplace communication. Could you elaborate on how you'd handle disagreements with colleagues?",
+"In a job interview, how would you describe your greatest professional achievement?",
+"When presenting to executives, what strategies do you use to keep their attention?",
+"That's insightful. How do you typically provide feedback to team members?"
+],
+'social': [
+"That's interesting! How do you usually break the ice when meeting new people?",
+"When in a group setting, how do you make sure everyone feels included in the conversation?",
+"What topics do you find work best for small talk at social gatherings?",
+"That's a good approach. How do you gracefully exit conversations that aren't going well?"
+],
+'dating': [
+"That's a nice way to express interest. How do you typically show that you're listening to your date?",
+"What kinds of questions do you ask to get to know someone better on a first date?",
+"How do you handle moments of silence during a date?",
+"That's thoughtful. How do you communicate your expectations in a new relationship?"
+]
+};
+// Get random response for the selected scenario
+const scenarioResponses = responses[selectedScenario] || responses['work'];
+const randomResponse = scenarioResponses[Math.floor(Math.random() * scenarioResponses.length)];
+// Add typing indicator
+setTimeout(() => {
+addMessage(randomResponse, false);
+}, 1000);
+}
+sendMessageBtn.addEventListener('click', () => {
+const message = chatInput.value.trim();
+if (message) {
+addMessage(message, true);
+chatInput.value = '';
+aiResponse();
+}
+});
+chatInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+sendMessageBtn.click();
+}
+});
+// End practice buttons
+endPracticeBtn.addEventListener('click', () => {
+showFeedbackScreen();
+});
+endVoicePracticeBtn.addEventListener('click', () => {
+showFeedbackScreen();
+});
+endVideoPracticeBtn.addEventListener('click', () => {
+showFeedbackScreen();
+});
+// Voice practice functionality
+let isRecording = false;
+startRecordingBtn.addEventListener('click', () => {
+if (!isRecording) {
+startRecordingBtn.innerHTML = '<i class="ri-stop-line mr-2"></i> Stop Recording';
+startRecordingBtn.classList.remove('bg-purple-600');
+startRecordingBtn.classList.add('bg-red-500');
+isRecording = true;
+} else {
+startRecordingBtn.innerHTML = '<i class="ri-mic-line mr-2"></i> Start Recording';
+startRecordingBtn.classList.remove('bg-red-500');
+startRecordingBtn.classList.add('bg-purple-600');
+isRecording = false;
+// Simulate AI response after recording stops
+setTimeout(() => {
+const aiResponseElement = document.querySelector('#voice-screen .bg-gray-100 p:last-child');
+aiResponseElement.textContent = "That's interesting! Could you tell me more about your approach to this situation?";
+}, 1000);
+}
+});
+// Video practice functionality
+let cameraOn = true;
+let micOn = true;
+toggleCameraBtn.addEventListener('click', () => {
+cameraOn = !cameraOn;
+if (cameraOn) {
+toggleCameraBtn.innerHTML = '<i class="ri-camera-line mr-2"></i> Camera';
+toggleCameraBtn.classList.remove('bg-red-100', 'text-red-700');
+toggleCameraBtn.classList.add('bg-gray-200', 'text-gray-700');
+} else {
+toggleCameraBtn.innerHTML = '<i class="ri-camera-off-line mr-2"></i> Camera';
+toggleCameraBtn.classList.remove('bg-gray-200', 'text-gray-700');
+toggleCameraBtn.classList.add('bg-red-100', 'text-red-700');
+}
+});
+toggleMicBtn.addEventListener('click', () => {
+micOn = !micOn;
+if (micOn) {
+toggleMicBtn.innerHTML = '<i class="ri-mic-line mr-2"></i> Mic';
+toggleMicBtn.classList.remove('bg-red-100', 'text-red-700');
+toggleMicBtn.classList.add('bg-gray-200', 'text-gray-700');
+} else {
+toggleMicBtn.innerHTML = '<i class="ri-mic-off-line mr-2"></i> Mic';
+toggleMicBtn.classList.remove('bg-gray-200', 'text-gray-700');
+toggleMicBtn.classList.add('bg-red-100', 'text-red-700');
+}
+});
+// Feedback screen
+function showFeedbackScreen() {
+// Set feedback screen content based on selected scenario and mode
+const feedbackScenarioIcon = document.getElementById('feedback-scenario-icon');
+const feedbackScenarioText = document.getElementById('feedback-scenario-text');
+const feedbackModeText = document.getElementById('feedback-mode-text');
+// Set scenario info
+if (selectedScenario === 'work') {
+feedbackScenarioIcon.className = 'w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3';
+feedbackScenarioIcon.innerHTML = '<i class="ri-briefcase-line ri-lg text-primary"></i>';
+feedbackScenarioText.textContent = 'Work Scenario';
+} else if (selectedScenario === 'social') {
+feedbackScenarioIcon.className = 'w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3';
+feedbackScenarioIcon.innerHTML = '<i class="ri-group-line ri-lg text-green-600"></i>';
+feedbackScenarioText.textContent = 'Social Scenario';
+} else if (selectedScenario === 'dating') {
+feedbackScenarioIcon.className = 'w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3';
+feedbackScenarioIcon.innerHTML = '<i class="ri-heart-line ri-lg text-red-500"></i>';
+feedbackScenarioText.textContent = 'Dating Scenario';
+}
+// Set mode info
+if (selectedMode === 'chat') {
+feedbackModeText.textContent = 'Chat Practice';
+} else if (selectedMode === 'voice') {
+feedbackModeText.textContent = 'Voice Practice';
+} else if (selectedMode === 'video') {
+feedbackModeText.textContent = 'Video Practice';
+}
+showScreen(feedbackScreen);
+}
+// Feedback screen buttons
+practiceAgainBtn.addEventListener('click', () => {
+showScreen(scenarioScreen);
+});
+// returnHomeBtn click handler removed as it now uses the href link
+// Bottom navigation
+navHome.addEventListener('click', () => {
+window.location.href = "https://readdy.ai/home/718d17de-a9a8-499c-b089-8edce736cb45/ad82f16b-06d8-45c1-ad23-1736abca9c26";
+});
+navPractice.addEventListener('click', () => {
+showScreen(scenarioScreen);
+});
+navProgress.addEventListener('click', () => {
+// This would normally navigate to progress screen
+const progressModal = document.createElement('div');
+progressModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+progressModal.innerHTML = `
+  <div class="bg-white rounded-lg p-6 w-4/5 max-w-sm">
+    <h3 class="text-lg font-medium mb-3">Progress</h3>
+    <p class="text-gray-600 mb-4">Progress screen would be shown here</p>
+    <button class="w-full bg-primary text-white py-2 rounded-button">Close</button>
+  </div>
+`;
+document.body.appendChild(progressModal);
+progressModal.querySelector('button').addEventListener('click', () => {
+  progressModal.remove();
+});
+});
+navProfile.addEventListener('click', () => {
+// This would normally navigate to profile screen
+const profileModal = document.createElement('div');
+profileModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+profileModal.innerHTML = `
+  <div class="bg-white rounded-lg p-6 w-4/5 max-w-sm">
+    <h3 class="text-lg font-medium mb-3">Profile</h3>
+    <p class="text-gray-600 mb-4">Profile screen would be shown here</p>
+    <button class="w-full bg-primary text-white py-2 rounded-button">Close</button>
+  </div>
+`;
+document.body.appendChild(profileModal);
+profileModal.querySelector('button').addEventListener('click', () => {
+  profileModal.remove();
+});
+});
+</script>
+</body>
+</html>

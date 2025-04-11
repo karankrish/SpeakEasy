@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SpeakEasy - Progress</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#f97316'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+  width: 375px;
+  height: 762px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.content-container {
+  height: calc(100% - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 60px;
+  padding-bottom: 60px;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e5e7eb;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+.dynamic-island-padding {
+  padding-top: env(safe-area-inset-top);
+}
+.achievement-badge {
+  position: relative;
+  overflow: hidden;
+}
+.achievement-badge.locked::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.achievement-badge.locked::before {
+  content: "\eb99";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  color: white;
+  font-size: 20px;
+}
+</style>
+</head>
+<body class="bg-white">
+<!-- Header Section -->
+<header class="fixed top-0 w-full bg-white shadow-sm z-10 px-4 py-3 flex items-center justify-between dynamic-island-padding">
+  <a href="https://readdy.ai/home/718d17de-a9a8-499c-b089-8edce736cb45/f848dcef-7e41-4308-8e55-cf8be06fe684" data-readdy="true" class="w-8 h-8 flex items-center justify-center cursor-pointer">
+    <i class="ri-arrow-left-line ri-lg text-gray-600"></i>
+  </a>
+  <h1 class="text-lg font-medium">Progress</h1>
+  <div class="w-8 h-8 flex items-center justify-center cursor-pointer">
+    <i class="ri-question-line ri-lg text-gray-600"></i>
+  </div>
+</header>
+
+<!-- Main Content -->
+<div class="content-container px-4" style="padding-top: calc(60px + env(safe-area-inset-top));">
+  <!-- Progress Overview Card -->
+  <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-sm text-gray-600 mb-1">Total Sessions</p>
+        <p class="text-2xl font-bold">48</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 mb-1">Current Streak</p>
+        <div class="flex items-center">
+          <div class="w-5 h-5 flex items-center justify-center mr-1">
+            <i class="ri-fire-fill ri-lg text-secondary"></i>
+          </div>
+          <p class="text-2xl font-bold">7</p>
+        </div>
+      </div>
+      <div class="relative w-16 h-16">
+        <svg class="w-full h-full" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" stroke-width="2"></circle>
+          <circle cx="18" cy="18" r="16" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="25" transform="rotate(-90 18 18)"></circle>
+          <text x="18" y="20" text-anchor="middle" fill="#3b82f6" font-size="8" font-weight="bold">75%</text>
+        </svg>
+        <p class="text-xs text-center mt-1">Weekly Goal</p>
+      </div>
+    </div>
+    <p class="text-sm text-gray-700 italic"></p>
+  </div>
+
+  <!-- Performance Chart -->
+  <div class="mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-medium">Performance Trend</h2>
+      <div class="flex space-x-2">
+        <button class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium cursor-pointer">Week</button>
+        <button class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium cursor-pointer">Month</button>
+        <button class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium cursor-pointer">Year</button>
+      </div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm">
+      <div id="performance-chart" style="width: 100%; height: 200px;"></div>
+    </div>
+  </div>
+
+  <!-- Skills Breakdown -->
+  <div class="mb-6">
+    <h2 class="text-lg font-medium mb-4">Skills Breakdown</h2>
+    <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm space-y-4">
+      <div>
+        <div class="flex justify-between mb-1">
+          <p class="text-sm font-medium">Clarity</p>
+          <p class="text-sm">78%</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill bg-primary" style="width: 78%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between mb-1">
+          <p class="text-sm font-medium">Confidence</p>
+          <p class="text-sm">82%</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill bg-primary" style="width: 82%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between mb-1">
+          <p class="text-sm font-medium">Active Listening</p>
+          <p class="text-sm">92%</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill bg-primary" style="width: 92%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between mb-1">
+          <p class="text-sm font-medium">Body Language</p>
+          <p class="text-sm">64%</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill bg-primary" style="width: 64%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between mb-1">
+          <p class="text-sm font-medium">Emotional Intelligence</p>
+          <p class="text-sm">71%</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill bg-primary" style="width: 71%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Practice Sessions -->
+  <div class="mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-medium">Recent Sessions</h2>
+      <p class="text-sm text-primary cursor-pointer">View All</p>
+    </div>
+    <div class="space-y-3">
+      <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm cursor-pointer">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <p class="font-medium">Work Presentation</p>
+            <p class="text-xs text-gray-500">April 11, 2025 • Video Mode</p>
+          </div>
+          <div class="flex items-center bg-green-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs font-medium text-green-700">92%</p>
+          </div>
+        </div>
+        <div class="flex space-x-2 mb-2">
+          <div class="bg-gray-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs text-gray-700">Clarity: 94%</p>
+          </div>
+          <div class="bg-gray-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs text-gray-700">Confidence: 90%</p>
+          </div>
+        </div>
+        <p class="text-xs text-gray-600">"Excellent presentation skills with clear articulation and confident delivery."</p>
+      </div>
+      
+      <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm cursor-pointer">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <p class="font-medium">Networking Event</p>
+            <p class="text-xs text-gray-500">April 9, 2025 • Chat Mode</p>
+          </div>
+          <div class="flex items-center bg-green-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs font-medium text-green-700">85%</p>
+          </div>
+        </div>
+        <div class="flex space-x-2 mb-2">
+          <div class="bg-gray-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs text-gray-700">Empathy: 88%</p>
+          </div>
+          <div class="bg-gray-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs text-gray-700">Listening: 82%</p>
+          </div>
+        </div>
+        <p class="text-xs text-gray-600">"Good engagement with follow-up questions. Work on remembering names."</p>
+      </div>
+      
+      <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm cursor-pointer">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <p class="font-medium">Job Interview</p>
+            <p class="text-xs text-gray-500">April 7, 2025 • Voice Mode</p>
+          </div>
+          <div class="flex items-center bg-yellow-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs font-medium text-yellow-700">76%</p>
+          </div>
+        </div>
+        <div class="flex space-x-2 mb-2">
+          <div class="bg-gray-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs text-gray-700">Clarity: 80%</p>
+          </div>
+          <div class="bg-gray-100 px-2 py-0.5 rounded-full">
+            <p class="text-xs text-gray-700">Confidence: 72%</p>
+          </div>
+        </div>
+        <p class="text-xs text-gray-600">"Good answers but spoke too quickly at times. Practice pacing."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="mb-6">
+    <h2 class="text-lg font-medium mb-4">Achievements</h2>
+    <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm">
+      <div class="grid grid-cols-4 gap-3">
+        <div class="flex flex-col items-center">
+          <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-1">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <i class="ri-mic-fill ri-lg text-primary"></i>
+            </div>
+          </div>
+          <p class="text-xs text-center">Voice Master</p>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <div class="w-14 h-14 bg-secondary/10 rounded-full flex items-center justify-center mb-1">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <i class="ri-fire-fill ri-lg text-secondary"></i>
+            </div>
+          </div>
+          <p class="text-xs text-center">7-Day Streak</p>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-1 achievement-badge locked">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <i class="ri-group-fill ri-lg text-gray-400"></i>
+            </div>
+          </div>
+          <p class="text-xs text-center text-gray-500">Social Pro</p>
+        </div>
+        
+        <div class="flex flex-col items-center">
+          <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-1 achievement-badge locked">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <i class="ri-video-fill ri-lg text-gray-400"></i>
+            </div>
+          </div>
+          <p class="text-xs text-center text-gray-500">Video Star</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button class="w-full py-2 border border-gray-200 rounded-button text-sm font-medium text-gray-700 cursor-pointer">View All Achievements</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Improvement Recommendations -->
+  <div class="mb-6">
+    <h2 class="text-lg font-medium mb-4">Personalized Recommendations</h2>
+    <div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm space-y-4">
+      <div class="flex">
+        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+          <div class="w-5 h-5 flex items-center justify-center">
+            <i class="ri-body-scan-fill ri-sm text-primary"></i>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1">Improve Body Language</p>
+          <p class="text-xs text-gray-600">Your posture and gestures need attention. Try our "Body Language Mastery" module for specific exercises.</p>
+        </div>
+      </div>
+      
+      <div class="flex">
+        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+          <div class="w-5 h-5 flex items-center justify-center">
+            <i class="ri-emotion-line ri-sm text-primary"></i>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1">Enhance Emotional Intelligence</p>
+          <p class="text-xs text-gray-600">Practice recognizing emotional cues in conversations. Complete the "Reading Emotions" challenge.</p>
+        </div>
+      </div>
+      
+      <div class="flex">
+        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+          <div class="w-5 h-5 flex items-center justify-center">
+            <i class="ri-time-line ri-sm text-primary"></i>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-1">Work on Pacing</p>
+          <p class="text-xs text-gray-600">Your speech tends to accelerate when nervous. Try the "Measured Speech" exercise in the Voice Training section.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 z-10" style="padding-bottom: env(safe-area-inset-bottom);">
+  <div class="grid grid-cols-4 h-14">
+    <a href="https://readdy.ai/home/718d17de-a9a8-499c-b089-8edce736cb45/f848dcef-7e41-4308-8e55-cf8be06fe684" data-readdy="true" class="flex flex-col items-center justify-center cursor-pointer">
+      <div class="w-6 h-6 flex items-center justify-center">
+        <i class="ri-home-5-line ri-lg text-gray-500"></i>
+      </div>
+      <p class="text-xs text-gray-500 mt-0.5">Home</p>
+    </a>
+    <div class="flex flex-col items-center justify-center cursor-pointer">
+      <div class="w-6 h-6 flex items-center justify-center">
+        <i class="ri-message-3-line ri-lg text-gray-500"></i>
+      </div>
+      <p class="text-xs text-gray-500 mt-0.5">Practice</p>
+    </div>
+    <div class="flex flex-col items-center justify-center cursor-pointer">
+      <div class="w-6 h-6 flex items-center justify-center">
+        <i class="ri-bar-chart-fill ri-lg text-primary"></i>
+      </div>
+      <p class="text-xs text-primary mt-0.5">Progress</p>
+    </div>
+    <div class="flex flex-col items-center justify-center cursor-pointer">
+      <div class="w-6 h-6 flex items-center justify-center">
+        <i class="ri-user-line ri-lg text-gray-500"></i>
+      </div>
+      <p class="text-xs text-gray-500 mt-0.5">Profile</p>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Initialize performance chart
+  const performanceChart = echarts.init(document.getElementById('performance-chart'));
+  
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: '{b}: {c}%'
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      axisLine: {
+        lineStyle: {
+          color: '#ddd'
+        }
+      },
+      axisLabel: {
+        fontSize: 10
+      }
+    },
+    yAxis: {
+      type: 'value',
+      min: 50,
+      max: 100,
+      axisLine: {
+        show: false
+      },
+      axisLabel: {
+        fontSize: 10,
+        formatter: '{value}%'
+      },
+      splitLine: {
+        lineStyle: {
+          color: '#eee'
+        }
+      }
+    },
+    series: [
+      {
+        name: 'Performance',
+        type: 'line',
+        smooth: true,
+        data: [76, 82, 79, 84, 78, 85, 92],
+        lineStyle: {
+          color: '#3b82f6',
+          width: 3
+        },
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: {
+          color: '#3b82f6'
+        },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              {
+                offset: 0,
+                color: 'rgba(59, 130, 246, 0.4)'
+              },
+              {
+                offset: 1,
+                color: 'rgba(59, 130, 246, 0.1)'
+              }
+            ]
+          }
+        }
+      }
+    ]
+  };
+  
+  performanceChart.setOption(option);
+  
+  // Resize chart when window size changes
+  window.addEventListener('resize', function() {
+    performanceChart.resize();
+  });
+</script>
+</body>
+</html>

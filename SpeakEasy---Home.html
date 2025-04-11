@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SpeakEasy - Communication Coach</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#f97316'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+width: 375px;
+height: 762px;
+margin: 0 auto;
+overflow: hidden;
+position: relative;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.content-container {
+height: calc(100% - 120px);
+overflow-y: auto;
+overflow-x: hidden;
+padding-top: 60px;
+padding-bottom: 60px;
+padding-left: env(safe-area-inset-left);
+padding-right: env(safe-area-inset-right);
+}
+.progress-bar {
+height: 8px;
+border-radius: 4px;
+background-color: #e5e7eb;
+}
+.progress-fill {
+height: 100%;
+border-radius: 4px;
+}
+.dynamic-island-padding {
+padding-top: env(safe-area-inset-top);
+}
+</style>
+</head>
+<body class="bg-white">
+<!-- Header Section -->
+<header class="fixed top-0 w-full bg-white shadow-sm z-10 px-4 py-3 flex items-center justify-between dynamic-island-padding">
+<div class="flex items-center">
+<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+<i class="ri-user-line ri-lg text-gray-600"></i>
+</div>
+<div class="ml-3">
+<p class="text-sm text-gray-600">Welcome back,</p>
+<p class="text-sm font-medium">Sarah Mitchell</p>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="w-8 h-8 flex items-center justify-center cursor-pointer">
+<i class="ri-notification-line ri-lg text-gray-600"></i>
+</div>
+<div class="w-8 h-8 flex items-center justify-center cursor-pointer">
+<i class="ri-settings-line ri-lg text-gray-600"></i>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<div class="content-container px-4" style="padding-top: calc(60px + env(safe-area-inset-top));">
+<!-- Streak Banner -->
+<div class="bg-primary rounded-md p-4 text-white mb-6">
+<div class="flex items-center mb-1">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-fire-fill ri-lg"></i>
+</div>
+<p class="font-medium">7 Day Streak!</p>
+</div>
+<p class="text-sm text-white/90">"The journey of a thousand conversations begins with a single word."</p>
+</div>
+<!-- Practice Scenarios -->
+<div class="mb-6">
+<h2 class="text-lg font-medium mb-4">Practice Scenarios</h2>
+<div class="grid grid-cols-3 gap-4">
+<div class="flex flex-col items-center cursor-pointer">
+<div class="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center mb-2">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-briefcase-line ri-lg text-gray-600"></i>
+</div>
+</div>
+<p class="text-sm text-center whitespace-nowrap overflow-hidden text-overflow-ellipsis">Work</p>
+</div>
+<div class="flex flex-col items-center cursor-pointer">
+<div class="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center mb-2">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-group-line ri-lg text-gray-600"></i>
+</div>
+</div>
+<p class="text-sm text-center whitespace-nowrap overflow-hidden text-overflow-ellipsis">Social</p>
+</div>
+<div class="flex flex-col items-center cursor-pointer">
+<div class="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center mb-2">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-heart-line ri-lg text-gray-600"></i>
+</div>
+</div>
+<p class="text-sm text-center whitespace-nowrap overflow-hidden text-overflow-ellipsis">Dating</p>
+</div>
+</div>
+</div>
+<!-- Today's Challenge -->
+<div class="mb-6">
+<h2 class="text-lg font-medium mb-4">Today's Challenge</h2>
+<div class="bg-white border border-gray-100 rounded-md p-4 shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-mic-line ri-lg text-gray-700"></i>
+</div>
+<p class="font-medium">Public Speaking</p>
+</div>
+<p class="text-sm text-primary font-medium">+50 XP</p>
+</div>
+<p class="text-sm text-gray-600 mb-4">Practice delivering a 2-minute presentation on your favorite hobby</p>
+<button class="w-full bg-black text-white py-3 rounded-button font-medium cursor-pointer">Start Challenge</button>
+</div>
+</div>
+<!-- Your Progress -->
+<div class="mb-6">
+<h2 class="text-lg font-medium mb-4">Your Progress</h2>
+<div class="flex justify-between mb-6">
+<div>
+<p class="text-sm text-gray-600 mb-1">Confidence Score</p>
+<div class="flex items-end">
+<p class="text-2xl font-bold">85</p>
+<p class="text-xs text-green-500 ml-1 mb-1">+12%</p>
+</div>
+</div>
+<div>
+<p class="text-sm text-gray-600 mb-1">Practice Sessions</p>
+<div class="flex items-end">
+<p class="text-2xl font-bold">24</p>
+<p class="text-xs text-gray-500 ml-1 mb-1">this month</p>
+</div>
+</div>
+</div>
+<!-- Progress Bars -->
+<div class="space-y-4">
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Clarity</p>
+<p class="text-sm">78%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 78%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Empathy</p>
+<p class="text-sm">92%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 92%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Tone</p>
+<p class="text-sm">85%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 85%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Posture</p>
+<p class="text-sm">64%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 64%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-sm font-medium">Eye Contact</p>
+<p class="text-sm">71%</p>
+</div>
+<div class="progress-bar">
+<div class="progress-fill bg-primary" style="width: 71%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 z-10" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="grid grid-cols-4 h-14">
+<div class="flex flex-col items-center justify-center cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-home-5-fill ri-lg text-primary"></i>
+</div>
+<p class="text-xs text-primary mt-0.5">Home</p>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-message-3-line ri-lg text-gray-500"></i>
+</div>
+<p class="text-xs text-gray-500 mt-0.5">Practice</p>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-bar-chart-line ri-lg text-gray-500"></i>
+</div>
+<p class="text-xs text-gray-500 mt-0.5">Progress</p>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-line ri-lg text-gray-500"></i>
+</div>
+<p class="text-xs text-gray-500 mt-0.5">Profile</p>
+</div>
+</div>
+</nav>
+</body>
+</html>
